@@ -7,14 +7,13 @@ WITH t_first_purchase AS (
     CustomerID
     FROM (
       SELECT 
-      DISTINCT
       DATE(TIMESTAMP(InvoiceDate)) AS date,
       UnitPrice * Quantity AS Sales,
       CustomerID,
       FIRST_VALUE(DATE(TIMESTAMP(InvoiceDate))) OVER (PARTITION BY CustomerID ORDER BY DATE(TIMESTAMP(InvoiceDate))) AS first_purchase_date
       FROM `helical-kayak-321710.cohort_analysis.online_retail_raw`
-      WHERE Quantity IS NOT NULL 
-      AND UnitPrice IS NOT NULL
+      WHERE Quantity > 0
+      AND UnitPrice > 0
       AND CustomerID IS NOT NULL 
     --   AND DATE(TIMESTAMP(InvoiceDate)) BETWEEN '2021-12-01' AND '2022-11-30'
     )
@@ -47,5 +46,4 @@ t_agg AS (
 
 SELECT * FROM t_cohort 
 WHERE first_purchase = '2022-05-01'
--- AND 
 ORDER BY first_purchase, month_order
